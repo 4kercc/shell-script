@@ -1,0 +1,98 @@
+#!/bin/bash
+#rm -rf $0
+
+function start_bbr {
+    # 启动bbr
+    wget --no-check -q 4ker.cc/s/d11.sh && bash d11.sh
+    echo "bbr has finished running!"
+    wget 4ker.cc/ntp && bash ntp
+    systemctl enable cron
+    apt install curl iperf3 -y
+}
+
+function run_tools {
+    # 判断文件是否存在，如果存在直接执行，如果不存在再通过wget下载
+    local script_path="./tools.sh"
+    if [[ -e $script_path ]]; then
+        echo "$script_path already exists. Running it now..."
+        bash "$script_path"
+    else
+        echo "Downloading tools.sh..."
+        wget -q 4ker.cc/s/tools.sh -O "$script_path"
+        echo "tools.sh has been downloaded!"
+        echo "Running tools.sh..."
+        bash "$script_path"
+    fi
+    echo "tools.sh has finished running!"
+}
+
+function install_iptables {
+    # 安装iptables进行优化
+    echo "Installing iptables..."
+    wget 4ker.cc/s/bt.sh && bash bt.sh 3
+    echo "iptables has been installed!"
+}
+
+function install_swap {
+    # 安装swap
+    echo "Installing swap..."
+    wget 4ker.cc/s/swap && bash swap
+    echo "Swap has been installed!"
+}
+
+function run_tcpx {
+    # 运行tcpx.sh进行系统优化
+    echo "Running tcpx.sh..."
+    wget 4ker.cc/s/tcpx.sh && bash tcpx.sh
+    echo "tcpx.sh has finished running!"
+}
+
+function sync_time {
+    # 同步时间
+    echo "Syncing time..."
+    wget 4ker.cc/ntp && bash ntp
+    echo "Time synchronization has finished!"
+}
+
+function display_menu {
+    echo "Please select an option:"
+    echo "1. Enable BBR"
+    echo "2. Run tools.sh"
+    echo "3. Install iptables"
+    echo "4. Install swap"
+    echo "5. Run tcpx.sh"
+    echo "6. SyncTime"
+}
+
+# 检查是否传递参数
+if [[ $# -eq 1 ]]; then
+    choice=$1
+else
+    display_menu
+    read -p "Enter your choice: " choice
+fi
+
+# 根据选择执行相应的函数
+case $choice in
+    1)
+        start_bbr
+        ;;
+    2)
+        run_tools
+        ;;
+    3)
+        install_iptables
+        ;;
+    4)
+        install_swap
+        ;;
+    5)
+        run_tcpx
+        ;;
+    6)
+        sync_time
+        ;;
+    *)
+        echo "Invalid choice. Please select a valid option."
+        ;;
+esac
